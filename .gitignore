@@ -35,6 +35,10 @@ yarn-error.log*
 next-env.d.ts
 
 # db
-.db
-.db-journal
+*.db
+*.db-journal
 src/backend/database/migrations/
+
+
+#intellij   
+.idea/
