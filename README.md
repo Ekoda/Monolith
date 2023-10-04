@@ -1,17 +1,18 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<!--LLM-->
+## Monolith Template
+This template is designed to provide a starting point for building a full-stack monolith using Next.js, Prisma, and SQLite. It includes a structured backend with controllers, a database folder with a Prisma schema, and endpoints under the pages directory. The template is configured to use SQLite for ease of development, with the option to transition to a more robust database like PostgreSQL as the project scales.
+<!--LLM-->
 
 ## Getting Started
 
-First, run the development server:
+Install any dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
 # or
+yarn install
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -24,17 +25,22 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 
 This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
+## Setting up the database
 
-To learn more about Next.js, take a look at the following resources:
+Ensure that the .env file has the DATABASE_URL variable set to file:./dev.db for SQLite. Or set it to a PostgreSQL database URL with additional information.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create an initial migration to set up the database schema: `npx prisma migrate dev --name init`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+Prisma will prompt you to apply the migration. This will create the `./dev.db` file (if it doesn't already exist), generate the necessary tables, and also generate the Prisma Client based on your schema.
+
+## Pub/Sub
+
+This template is designed with extensibility in mind, allowing for the integration of a Publish-Subscribe (Pub/Sub) messaging system for handling asynchronous events. A Pub/Sub system can facilitate the decoupling of event producers and consumers, thereby promoting scalable and maintainable code structures.
+
+The `src/backend/pubsub.ts` file houses the Publisher and Subscriber interfaces along with a PubSub class that implements both interfaces. These interfaces are modeled to be flexible, enabling you to plug in different Pub/Sub service providers like Google Pub/Sub, RabbitMQ, etc., as your project scales.
 
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Check out [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
