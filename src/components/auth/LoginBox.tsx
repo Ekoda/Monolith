@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Card, CardContent, Button, TextField, Snackbar, Alert} from "@mui/material";
 import {Apple, Facebook, Google} from "@mui/icons-material";
 import {TITLE} from "@/config/constants";
-import { standardLogin, googleLogin, appleLogin, facebookLogin } from "@/config/auth";
+import {standardLogin, googleLogin, appleLogin, facebookLogin} from "@/config/auth";
 ;
 
 export default function LoginBox() {
@@ -15,7 +15,8 @@ export default function LoginBox() {
         <>
             <Card sx={{textAlign: "center", width: "450px"}} title={"Sign in to " + (TITLE)}>
                 <CardContent sx={{display: "flex", flexDirection: "column", justifyContent: "center", gap: "10px"}}>
-                    {standardLogin ? <form style={{display: "flex", flexDirection: "column", justifyContent: "center", gap: "10px"}}
+                    {standardLogin ?
+                        <form style={{display: "flex", flexDirection: "column", justifyContent: "center", gap: "10px"}}
                            onSubmit={e => {
                                e.preventDefault();
                                // send login request
@@ -26,7 +27,8 @@ export default function LoginBox() {
                                    value={password} onChange={e => setPassword(e.target.value)}
                                    autoComplete={"password"} type={"password"}/>
                         <Button type={"submit"} style={{marginBottom: "10px"}} variant="contained" disabled={isLoading}>Sign in</Button>
-                    </form> : null}
+                    </form>
+                        : null}
                     {googleLogin ? <Button sx={{marginTop: "10px"}} variant="outlined" disabled={isLoading} startIcon={<Google/>}>Sign in with google</Button> : null}
                     {appleLogin ? <Button variant="outlined" disabled={isLoading} startIcon={<Apple/>}>Sign in with apple</Button> : null}
                     {facebookLogin ? <Button variant="outlined" disabled={isLoading} startIcon={<Facebook/>}>Sign in with facebook</Button> : null}
