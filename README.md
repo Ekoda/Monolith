@@ -32,7 +32,7 @@ Prisma will prompt you to apply the migration. This will create the `./dev.db` f
 
 ## Auth
 
-In this project, NextAuth has already been set up to facilitate OAuth authentication. The configuration is located in the `[...nextauth].ts` file within the `pages/api/auth directory`. Currently, it is configured for Google authentication, but you can easily extend it to other providers as well.
+NextAuth has already been set up to facilitate OAuth authentication. The configuration is located in the `[...nextauth].ts` file within the `pages/api/auth directory`. Currently, it is configured for Google authentication, but you can easily extend it to other providers as well.
 
 When a user is signed in for the first time a new account is created in the database. And when an existing user signs in their details are updated.
 
