@@ -30,6 +30,30 @@ Create an initial migration to set up the database schema: `npx prisma migrate d
 
 Prisma will prompt you to apply the migration. This will create the `./dev.db` file (if it doesn't already exist), generate the necessary tables, and also generate the Prisma Client based on your schema.
 
+## Auth
+
+In this project, NextAuth has already been set up to facilitate OAuth authentication. The configuration is located in the `[...nextauth].ts` file within the `pages/api/auth directory`. Currently, it is configured for Google authentication, but you can easily extend it to other providers as well.
+
+When a user is signed in for the first time a new account is created in the database. And when an existing user signs in their details are updated.
+
+To enable Google authentication, you just need to create and configure a project on the Google Developer Console and obtain your OAuth 2.0 credentials (Client ID and Client Secret). Follow the steps provided in the previous section to configure Google authentication.
+
+Create a Google OAuth 2.0 Client ID and Secret:
+
+1. Go to the Google Developer Console.
+2. Create a new project, or select an existing one.
+3. Navigate to "Credentials" on the sidebar.
+4. Click on "Create credentials" and select "OAuth client ID".
+5. Configure the consent screen and provide the necessary information.
+6. For the application type, select "Web application".
+7. Set the authorized JavaScript origins and redirect URIs (for local testing, use http://localhost:3000).
+8. After creation, you'll be provided with a "Client ID" and "Client Secret".
+9. Set up the following variables in the `.env` file
+```
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
 ## Pub/Sub
 
 This template is designed with extensibility in mind, allowing for the integration of a Publish-Subscribe (Pub/Sub) messaging system for handling asynchronous events. A Pub/Sub system can facilitate the decoupling of event producers and consumers, thereby promoting scalable and maintainable code structures.

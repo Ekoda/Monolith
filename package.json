@@ -15,11 +15,13 @@
     "@mui/material": "^5.14.11",
     "@prisma/client": "^5.3.1",
     "next": "13.5.4",
+    "next-auth": "^4.23.2",
     "react": "^18",
     "react-dom": "^18",
     "react-fetch-hook": "^1.9.5"
   },
   "devDependencies": {
+    "@types/next-auth": "^3.15.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

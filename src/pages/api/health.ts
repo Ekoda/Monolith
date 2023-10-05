@@ -1,5 +1,5 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {internalError500, methodNotAllowed405, ok200} from "@/utils/api";
+import {internalError500, methodNotAllowed405, ok200} from "@/utils/apiUtils";
 import {checkDbHealth} from "@/backend/controllers/healthController";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {

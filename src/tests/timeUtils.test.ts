@@ -1,4 +1,4 @@
-import {addDays, addHours, addMinutes, addMonths, addWeeks, getCurrentTime} from "@/utils/time";
+import {addDays, addHours, addMinutes, addMonths, addWeeks, getCurrentTime} from "@/utils/timeUtils";
 import {describe, expect, test} from "@jest/globals";
 
 describe('Time Utility Functions', () => {
