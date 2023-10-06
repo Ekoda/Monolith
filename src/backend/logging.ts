@@ -1,8 +1,10 @@
+import {getCurrentTime} from "@/utils/timeUtils";
+
 interface LogEntry {
     level: 'debug' | 'info' | 'warn' | 'error';
     message: string;
     metadata?: Record<string, any>;
-    timestamp: Date;
+    timestamp?: Date;
 }
 
 export interface Logger {
@@ -26,9 +28,9 @@ export function withLogging<T>(func: (...args: any[]) => T, ...args: any[]): T {
         return func(...args);
     } catch (error) {
         if (error instanceof Error) {
-            logger.log({ level: 'error', message: error.message, timestamp: new Date() }).catch(console.error);
+            logger.log({ level: 'error', message: error.message, timestamp: getCurrentTime() }).catch(console.error);
         } else {
-            logger.log({ level: 'error', message: 'An unknown error occurred', timestamp: new Date() }).catch(console.error);
+            logger.log({ level: 'error', message: 'An unknown error occurred', timestamp: getCurrentTime() }).catch(console.error);
         }
         throw error;
     }

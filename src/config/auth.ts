@@ -1,6 +1,6 @@
 
 // supported logins
-export const standardLogin = true;
+export const standardLogin = false;
 export const googleLogin = true;
-export const appleLogin = false;
+export const appleLogin = true;
 export const facebookLogin = false;
