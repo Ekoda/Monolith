@@ -5,7 +5,7 @@ import {findUserByEmail} from "@/backend/services/userService";
 
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-    const user = await getUser(req, res);
+    const user = await getUser(req);
     or403(res, !!user, "You must be signed in to view this")
 
     switch (req.method) {

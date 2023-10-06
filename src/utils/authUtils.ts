@@ -1,6 +1,6 @@
 import {getServerSession} from "next-auth";
 import {NextApiRequest, NextApiResponse} from "next";
-import {authOptions} from "@/pages/api/auth/[...nextauth]";
+import {getSession} from "next-auth/react";
 
 interface SessionUser {
     name?: string | null | undefined,
@@ -8,15 +8,15 @@ interface SessionUser {
     image?: string | null | undefined
 }
 
-export async function getUser(req: NextApiRequest, res: NextApiResponse): Promise<SessionUser | null> {
-    const session = await getServerSession(req, res, authOptions);
+export async function getUser(req: NextApiRequest): Promise<SessionUser | null> {
+    const session = await getSession({req});
     if (session?.user?.email) {
         return session.user;
     }
     return null;
 }
 
-export async function userSignedIn(req: NextApiRequest, res: NextApiResponse): Promise<boolean> {
-    const user = await getUser(req, res);
+export async function userSignedIn(req: NextApiRequest): Promise<boolean> {
+    const user = await getUser(req);
     return !!user;
 }
