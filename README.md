@@ -14,15 +14,6 @@ This template provides a structured starting point for building a full-stack mon
 
 ## Getting Started
 
-pull the template from github and then  
-```bash
-# rename the project
-mv Monolith YourProjectName
-# remove existing git tracking
-rm -rf .git
-
-```
-
 Run `setup.sh` to install dependencies and set up a sqlite db for development or follow the steps below to set up the project manually.
 
 1. **Install Dependencies:**
