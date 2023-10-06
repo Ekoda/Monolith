@@ -14,14 +14,10 @@ This template provides a structured starting point for building a full-stack mon
 
 ## Getting Started
 
-pull the template from github
+pull the template from github and then  
 ```bash
 # rename the project
-cd Monolith
-cd ..
 mv Monolith YourProjectName
-cd YourProjectName
-
 # remove existing git tracking
 rm -rf .git
 
