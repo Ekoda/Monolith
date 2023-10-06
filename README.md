@@ -60,6 +60,10 @@ This template is designed with extensibility in mind, allowing for the integrati
 
 The `src/backend/pubsub.ts` file houses the Publisher and Subscriber interfaces along with a PubSub class that implements both interfaces. These interfaces are modeled to be flexible, enabling you to plug in different Pub/Sub service providers like Google Pub/Sub, RabbitMQ, etc., as your project scales.
 
+## Logging
+
+The src/backend/logging.ts file encapsulates the logging logic and interfaces required for structured and consistent log handling throughout the application. This modular design allows for the integration of various logging libraries or services as the need arises, promoting a scalable and easily maintainable logging system.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
