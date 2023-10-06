@@ -1,6 +1,6 @@
 # Monolith Template
 
-This template provides a structured starting point for building a full-stack monolith application using Next.js, Prisma, and SQLite. It encapsulates a well-organized backend, a Prisma schema within a database folder, and API endpoints structured under the pages directory. Initially configured with SQLite for ease of development, it allows for a smooth transition to more robust databases like PostgreSQL as your project scales.
+This template provides a structured starting point for building a full-stack monolith application using Next.js, Prisma, and SQLite. It includes an organized backend, a Prisma db schema, and API endpoints structured under the pages directory. Initially configured with SQLite for ease of development, it allows for a smooth transition to more robust databases like PostgreSQL as your project scales.
 
 ## Table of Contents
 
@@ -13,6 +13,21 @@ This template provides a structured starting point for building a full-stack mon
 - [Notes](#notes)
 
 ## Getting Started
+
+pull the template from github
+```bash
+# rename the project
+cd Monolith
+cd ..
+mv Monolith YourProjectName
+cd YourProjectName
+
+# remove existing git tracking
+rm -rf .git
+
+```
+
+Run `setup.sh` to install dependencies and set up a sqlite db for development or follow the steps below to set up the project manually.
 
 1. **Install Dependencies:**
     ```bash
@@ -37,7 +52,10 @@ This template provides a structured starting point for building a full-stack mon
     npx prisma migrate dev --name init
     ```
 
-3. Apply the migration, which generates the necessary tables and the Prisma Client based on your schema.
+3. Apply the migration, which generates the necessary tables and the Prisma Client based on your schema:
+   ```
+   npm run migrate 
+   ```
 
 ## Authentication
 
@@ -49,6 +67,8 @@ This template is pre-configured with NextAuth for Google authentication, located
 4. Configure the consent screen, set the application type to "Web application", and provide authorized JavaScript origins and redirect URIs.
 5. Obtain your "Client ID" and "Client Secret" and update the `.env` file with these credentials:
     ```env
+    # auth credentials
+    NEXTAUTH_URL=http://localhost:3000
     GOOGLE_CLIENT_ID=your-google-client-id
     GOOGLE_CLIENT_SECRET=your-google-client-secret
     ```
