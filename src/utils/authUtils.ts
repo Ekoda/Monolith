@@ -10,5 +10,8 @@ interface SessionUser {
 
 export async function userSignedIn(req: NextApiRequest, res: NextApiResponse): Promise<SessionUser | null> {
     const session = await getServerSession(req, res, authOptions);
-    return session?.user || null;
+    if (session?.user?.email) {
+        return session.user;
+    }
+    return null;
 }
