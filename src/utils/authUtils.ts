@@ -8,10 +8,15 @@ interface SessionUser {
     image?: string | null | undefined
 }
 
-export async function userSignedIn(req: NextApiRequest, res: NextApiResponse): Promise<SessionUser | null> {
+export async function getUser(req: NextApiRequest, res: NextApiResponse): Promise<SessionUser | null> {
     const session = await getServerSession(req, res, authOptions);
     if (session?.user?.email) {
         return session.user;
     }
     return null;
+}
+
+export async function userSignedIn(req: NextApiRequest, res: NextApiResponse): Promise<boolean> {
+    const user = await getUser(req, res);
+    return !!user;
 }
