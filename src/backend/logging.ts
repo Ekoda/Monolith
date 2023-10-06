@@ -12,7 +12,7 @@ export interface Logger {
 }
 
 class AppLogger implements Logger {
-    async log({timestamp = new Date(), ...entry}: LogEntry): Promise<void | Error> {
+    async log({timestamp = getCurrentTime(), ...entry}: LogEntry): Promise<void | Error> {
         try {
             // Implementation will go here
 
@@ -28,9 +28,9 @@ export function withLogging<T>(func: (...args: any[]) => T, ...args: any[]): T {
         return func(...args);
     } catch (error) {
         if (error instanceof Error) {
-            logger.log({ level: 'error', message: error.message, timestamp: getCurrentTime() }).catch(console.error);
+            logger.log({ level: 'error', message: error.message }).catch(console.error);
         } else {
-            logger.log({ level: 'error', message: 'An unknown error occurred', timestamp: getCurrentTime() }).catch(console.error);
+            logger.log({ level: 'error', message: 'An unknown error occurred' }).catch(console.error);
         }
         throw error;
     }
