@@ -4,6 +4,7 @@ This template provides a structured starting point for building a full-stack mon
 
 ## Table of Contents
 
+- [Rapid Development Philosophy](#rapid-development-philosophy)
 - [Getting Started](#getting-started)
 - [Database Setup](#database-setup)
 - [Authentication](#authentication)
