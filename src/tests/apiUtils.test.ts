@@ -1,6 +1,6 @@
 import fetchMock from "jest-fetch-mock";
 import {logger} from "@/backend/logging";
-import {fetchOrThrow} from "@/utils/apiUtils";
+import {fetchOrThrow, sanitizeHeaders} from "@/utils/apiUtils";
 
 fetchMock.enableMocks();
 
@@ -38,6 +38,67 @@ describe("fetchOrThrow", () => {
                 message: "HTTP error: 404 Not Found",
             })
         );
+    });
+
+});
+
+describe("sanitizeHeaders", () => {
+
+    it("should return undefined when headers is undefined", () => {
+        expect(sanitizeHeaders(undefined)).toBeUndefined();
+    });
+
+    describe("when headers is an instance of Headers", () => {
+        let headers: Headers;
+
+        beforeEach(() => {
+            headers = new Headers({
+                Authorization: "Bearer token",
+                Cookie: "session_id=abc123",
+                "Content-Type": "application/json"
+            });
+        });
+
+        it("should sanitize sensitive headers", () => {
+            const sanitizedHeaders = sanitizeHeaders(headers) as Headers;
+            expect(sanitizedHeaders.get("Authorization")).toBe("***");
+            expect(sanitizedHeaders.get("Cookie")).toBe("***");
+            expect(sanitizedHeaders.get("Content-Type")).toBe("application/json");
+        });
+    });
+
+    describe("when headers is an array", () => {
+        const headers = [
+            ["Authorization", "Bearer token"],
+            ["Cookie", "session_id=abc123"],
+            ["Content-Type", "application/json"]
+        ];
+
+        it("should sanitize sensitive headers", () => {
+            const sanitizedHeaders = sanitizeHeaders(headers as [string, string][]);
+            expect(sanitizedHeaders).toEqual([
+                ["Authorization", "***"],
+                ["Cookie", "***"],
+                ["Content-Type", "application/json"]
+            ]);
+        });
+    });
+
+    describe("when headers is a Record<string, string>", () => {
+        const headers = {
+            Authorization: "Bearer token",
+            Cookie: "session_id=abc123",
+            "Content-Type": "application/json"
+        };
+
+        it("should sanitize sensitive headers", () => {
+            const sanitizedHeaders = sanitizeHeaders(headers);
+            expect(sanitizedHeaders).toEqual({
+                Authorization: "***",
+                Cookie: "***",
+                "Content-Type": "application/json"
+            });
+        });
     });
 
 });

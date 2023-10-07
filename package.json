@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate": "npx prisma migrate dev --name auto && npx prisma generate"
+    "migrate": "npx prisma migrate dev --name auto && npx prisma generate",
+    "test": "jest"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

@@ -64,6 +64,37 @@ export function or403(res: NextApiResponse, condition: boolean, message?: string
     return condition || forbidden403(res, message);
 }
 
+type RequestHeaders = [string, string][] | Record<string, string> | Headers | undefined;
+
+export function sanitizeHeaders(headers: RequestHeaders): RequestHeaders {
+    const sensitiveHeaders: string[] = ["Authorization", "Cookie", "Set-Cookie"];
+
+    if (!headers) {
+        return headers;
+    }
+
+    if (headers instanceof Headers) {
+        sensitiveHeaders.forEach(sensitiveHeader => {
+            if (headers.has(sensitiveHeader)) {
+                headers.set(sensitiveHeader, "***");
+            }
+        });
+        return headers;
+    }
+
+    if (Array.isArray(headers)) {
+        return headers.map(header =>
+            sensitiveHeaders.includes(header[0]) ? [header[0], "***"] : header
+        ) as [string, string][];
+    }
+
+    const sanitizedHeaders: Record<string, string> = {};
+    for (const [key, value] of Object.entries(headers)) {
+        sanitizedHeaders[key] = sensitiveHeaders.includes(key) ? "***" : value;
+    }
+    return sanitizedHeaders;
+}
+
 export async function fetchOrThrow(input: RequestInfo, init?: RequestInit): Promise<Response> {
     const response = await fetch(input, init);
     if (!response.ok) {
@@ -74,7 +105,7 @@ export async function fetchOrThrow(input: RequestInfo, init?: RequestInit): Prom
             metadata: {
                 request: {
                     method: init?.method || "GET",
-                    headers: init?.headers,
+                    headers: sanitizeHeaders(init?.headers),
                     body: init?.body,
                 },
                 response: {

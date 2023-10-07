@@ -10,10 +10,9 @@ const exampleApi = {
     },
 
     async createPost(post: ExamplePost): Promise<ExamplePost> {
-        const requestBody = JSON.stringify(post);
         const response = await fetchOrThrow(`${URL}/posts`, {
             method: "POST",
-            body: requestBody
+            body: JSON.stringify(post)
         });
         return await response.json();
     }
