@@ -1,4 +1,5 @@
 import { NextApiResponse } from "next";
+import {logger} from "@/backend/logging";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -61,4 +62,30 @@ export function or404<T>(res: NextApiResponse, data: T): void | T {
 
 export function or403(res: NextApiResponse, condition: boolean, message?: string): void | boolean {
     return condition || forbidden403(res, message);
+}
+
+export async function fetchOrThrow(input: RequestInfo, init?: RequestInit): Promise<Response> {
+    const response = await fetch(input, init);
+    if (!response.ok) {
+        const errorMessage = `HTTP error: ${response.status} ${response.statusText}`;
+        logger.log({
+            level: 'error',
+            message: errorMessage,
+            metadata: {
+                request: {
+                    method: init?.method || 'GET',
+                    headers: init?.headers,
+                    body: init?.body,
+                },
+                response: {
+                    status: response.status,
+                    statusText: response.statusText,
+                    url: response.url,
+                    body: await response.text()
+                }
+            }
+        }).catch(console.error);
+        throw new Error(errorMessage);
+    }
+    return response;
 }
