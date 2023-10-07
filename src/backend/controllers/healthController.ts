@@ -6,8 +6,8 @@ export async function checkDbHealth(): Promise<boolean> {
         .then(() => true)
         .catch(() => {
             logger.log({
-                level: 'error',
-                message: 'database health check failed'
+                level: "error",
+                message: "database health check failed"
                 })
             return false;
         });

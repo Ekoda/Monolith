@@ -1,4 +1,4 @@
-import { User as NextAuthUser, Account as NextAuthAccount, Profile as NextAuthProfile } from 'next-auth';
+import { User as NextAuthUser, Account as NextAuthAccount, Profile as NextAuthProfile } from "next-auth";
 import {createUser, findUserByEmail, updateLastLogin} from "@/backend/services/userService";
 import {validatePresent} from "@/utils/errorUtils";
 import {withLogging} from "@/backend/logging";

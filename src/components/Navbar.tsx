@@ -1,10 +1,10 @@
-import * as React from 'react';
+import * as React from "react";
 import {
     AppBar, Avatar, Backdrop, Box, Button, CircularProgress, Container,
     IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography, Link
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import {signOut, useSession} from 'next-auth/react';
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import {signOut, useSession} from "next-auth/react";
 import {TITLE} from "@/config/constants";
 
 const pages = [
@@ -20,7 +20,7 @@ const Navbar = () => {
 
     const settings = [
         {
-            key: 'Logout',
+            key: "Logout",
             onClick: () => {
                 setLogoutTriggered(true);
                 signOut().then(r => setLogoutTriggered(false));
@@ -49,13 +49,13 @@ const Navbar = () => {
 
     return (
         <>
-            <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={logoutTriggered}>
+            <Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={logoutTriggered}>
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <AppBar component={'nav'} variant={"outlined"} elevation={0} sx={{backgroundColor: "transparent", position: "static"}}>
+            <AppBar component={"nav"} variant={"outlined"} elevation={0} sx={{backgroundColor: "transparent", position: "static"}}>
                 <Container maxWidth="xl">
                     <Toolbar disableGutters>
-                        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                        <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
                             <IconButton
                                 size="large"
                                 aria-label="menu"
@@ -70,18 +70,18 @@ const Navbar = () => {
                                 id="menu-appbar"
                                 anchorEl={anchorElNav}
                                 anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'left',
+                                    vertical: "bottom",
+                                    horizontal: "left",
                                 }}
                                 keepMounted
                                 transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'left',
+                                    vertical: "top",
+                                    horizontal: "left",
                                 }}
                                 open={Boolean(anchorElNav)}
                                 onClose={handleCloseNavMenu}
                                 sx={{
-                                    display: { xs: 'block', md: 'none' },
+                                    display: { xs: "block", md: "none" },
                                 }}
                             >
                                 {pages.map((page) => (
@@ -90,9 +90,9 @@ const Navbar = () => {
                                                color={"secondary"}
                                                href={page.path}
                                                sx={{
-                                                   color: 'inherit',
-                                                   '&:visited': {
-                                                       color: 'inherit'
+                                                   color: "inherit",
+                                                   "&:visited": {
+                                                       color: "inherit"
                                                    }
                                                }}
                                         >{page.name}</Link>
@@ -107,21 +107,21 @@ const Navbar = () => {
                             href="/"
                             sx={{
                                 mr: 2,
-                                display: { xs: 'none', md: 'flex' },
-                                fontFamily: 'Verdana',
+                                display: { xs: "none", md: "flex" },
+                                fontFamily: "Verdana",
                                 fontWeight: 200,
-                                color: 'inherit',
-                                textDecoration: 'none',
+                                color: "inherit",
+                                textDecoration: "none",
                             }}
                         >
                             {TITLE}
                         </Typography>
-                        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                             {pages.map((page) => (
                                 <Button
                                     key={page.name}
                                     href={page.path}
-                                    sx={{ my: 2, color: 'white', display: 'block' }}
+                                    sx={{ my: 2, color: "white", display: "block" }}
                                 >
                                     {page.name}
                                 </Button>
@@ -134,17 +134,17 @@ const Navbar = () => {
                                 </IconButton>
                             </Tooltip>
                             <Menu
-                                sx={{ mt: '45px' }}
+                                sx={{ mt: "45px" }}
                                 id="menu-appbar"
                                 anchorEl={anchorElUser}
                                 anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
+                                    vertical: "top",
+                                    horizontal: "right",
                                 }}
                                 keepMounted
                                 transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
+                                    vertical: "top",
+                                    horizontal: "right",
                                 }}
                                 open={Boolean(anchorElUser)}
                                 onClose={handleCloseUserMenu}

@@ -69,11 +69,11 @@ export async function fetchOrThrow(input: RequestInfo, init?: RequestInit): Prom
     if (!response.ok) {
         const errorMessage = `HTTP error: ${response.status} ${response.statusText}`;
         logger.log({
-            level: 'error',
+            level: "error",
             message: errorMessage,
             metadata: {
                 request: {
-                    method: init?.method || 'GET',
+                    method: init?.method || "GET",
                     headers: init?.headers,
                     body: init?.body,
                 },

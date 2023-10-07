@@ -1,7 +1,7 @@
-import db from '../database/database'
+import db from "../database/database"
 import {User} from ".prisma/client";
 import {getCurrentTime} from "@/utils/timeUtils";
-import { User as NextAuthUser} from 'next-auth';
+import { User as NextAuthUser} from "next-auth";
 
 
 export async function findUserById(id: string): Promise<User | null> {

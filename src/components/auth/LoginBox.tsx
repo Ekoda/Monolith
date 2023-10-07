@@ -18,10 +18,10 @@ export default function LoginBox() {
 
     return (
         <>
-            <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isLoading && !showError}>
+            <Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isLoading && !showError}>
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
             <Card sx={{textAlign: "center", width: "450px"}} title={"Sign in to " + (TITLE)}>
                 <CardContent sx={{display: "flex", flexDirection: "column", justifyContent: "center", gap: "10px"}}>
                     {standardLogin ?
@@ -38,14 +38,14 @@ export default function LoginBox() {
                         <Button type={"submit"} style={{marginBottom: "10px"}} variant="contained" disabled={isLoading}>Sign in</Button>
                     </form>
                         : null}
-                    {googleLogin ? <Button onClick={() => signIn('google')} sx={{marginTop: "10px"}} variant="outlined" disabled={isLoading} startIcon={<Google/>}>Sign in with google</Button> : null}
-                    {appleLogin ? <Button onClick={() => signIn('apple')} variant="outlined" disabled={isLoading} startIcon={<Apple/>}>Sign in with apple</Button> : null}
-                    {facebookLogin ? <Button onClick={() => signIn('facebook')} variant="outlined" disabled={isLoading} startIcon={<Facebook/>}>Sign in with facebook</Button> : null}
+                    {googleLogin ? <Button onClick={() => signIn("google")} sx={{marginTop: "10px"}} variant="outlined" disabled={isLoading} startIcon={<Google/>}>Sign in with google</Button> : null}
+                    {appleLogin ? <Button onClick={() => signIn("apple")} variant="outlined" disabled={isLoading} startIcon={<Apple/>}>Sign in with apple</Button> : null}
+                    {facebookLogin ? <Button onClick={() => signIn("facebook")} variant="outlined" disabled={isLoading} startIcon={<Facebook/>}>Sign in with facebook</Button> : null}
                 </CardContent>
             </Card>
             </div>
-            <Snackbar open={showError} autoHideDuration={6000} anchorOrigin={{vertical: 'bottom', horizontal: 'center' }} onClose={e => setShowError(false)} onClick={e => setShowError(false)}>
-                <Alert severity="warning" variant={'outlined'} sx={{width: '100%'}}>
+            <Snackbar open={showError} autoHideDuration={6000} anchorOrigin={{vertical: "bottom", horizontal: "center" }} onClose={e => setShowError(false)} onClick={e => setShowError(false)}>
+                <Alert severity="warning" variant={"outlined"} sx={{width: "100%"}}>
                     Oops, something went wrong - try another username or password
                 </Alert>
             </Snackbar>
