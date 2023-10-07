@@ -11,6 +11,7 @@ This template provides a structured starting point for building a full-stack mon
 - [Publish-Subscribe System](#publish-subscribe-system)
 - [Logging](#logging)
 - [Deployment](#deployment)
+- [Integrations](#integrations)
 - [Notes](#notes)
 
 ## Rapid Development Philosophy
@@ -82,9 +83,17 @@ Explore `src/backend/pubsub.ts` to understand the Publisher and Subscriber inter
 
 The `src/backend/logging.ts` file encapsulates structured logging logic and interfaces. This modular design allows for integration with various logging libraries or services as needed.
 
+## Integrations
+
+Integrations with external services or APIs are organized in a modular and isolated manner, allowing for clearer code separation and easier management. Each integration is structured within its own directory under the src/backend/integrations directory. This way, the integrations are kept separate from other backend logic, promoting cleaner and more maintainable code.
+
 ## Deployment
 
 Deploy your Next.js app on the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) for a seamless experience. Refer to the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 ## Notes
+
+Monolith, has been primarily crafted for personal use, based on my familiarity and comfort with certain technologies, including but not limited to Next.js, Prisma, and SQLite. While it serves as a structured starting point for building a full-stack monolith application, the choice of technologies and the architecture reflect personal preferences and experiences. As such, while others may find Monolith useful, it is advisable to have a good understanding of the included technologies and frameworks before diving in.
+
 This documentation provides an overview and setup instructions for the Monolith Template. For a deeper understanding, feel free to explore the directory structure and the code.
+
