@@ -25,7 +25,7 @@ export async function createUser(user: NextAuthUser) {
         data: {
             email: user.email as string,
             name: user.name as string,
-            lastLogin: getCurrentTime()
+            lastLoginAt: getCurrentTime()
         }
     })
 }
