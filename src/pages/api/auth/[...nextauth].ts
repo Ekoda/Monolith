@@ -1,5 +1,5 @@
 import GoogleProvider from "next-auth/providers/google";
-import NextAuth, { NextAuthOptions, User, Account, Profile } from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import {handleSignIn} from "@/backend/controllers/authController";
 
 export const authOptions: NextAuthOptions = {
