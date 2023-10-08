@@ -9,7 +9,7 @@ export async function handleSignIn(user: NextAuthUser, account: NextAuthAccount 
     const dbUser = await findUserByEmail(user.email as string)
 
     if(dbUser) {
-        await updateUser(user.email as string, {lastLogin: getCurrentTime()})
+        await updateUser(user.email as string, {lastLoginAt: getCurrentTime()})
     } else {
         await createUser(user)
     }

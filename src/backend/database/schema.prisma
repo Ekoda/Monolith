@@ -6,17 +6,17 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite" // or "postgresql", etc.
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String    @id @default(uuid()) @map("id")
-  name      String    @map("name")
-  email     String    @unique @map("email")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  lastLogin DateTime? @map("last_login")
+  id          String    @id @default(uuid()) @map("id")
+  name        String    @map("name")
+  email       String    @unique @map("email")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  lastLoginAt DateTime? @map("last_login_at")
 
   @@map("users") // table name
 }
