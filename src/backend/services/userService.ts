@@ -12,10 +12,10 @@ export async function findUserByEmail(email: string): Promise<User | null> {
     return db.user.findUnique({where: {email}});
 }
 
-export async function updateUser(email: string, data: Partial<User>){
+export async function updateUser(email: string, user: Partial<User>){
     await db.user.update({
             where: {email},
-            data
+            data: user
         }
     )
 }
