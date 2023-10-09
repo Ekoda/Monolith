@@ -1,7 +1,7 @@
 # Monolith Template
-
+<!--LLM-->
 This template provides a structured starting point for building a full-stack monolith application using Next.js, Prisma, and SQLite. It includes an organized backend, a Prisma db schema, and API endpoints structured under the pages directory. Initially configured with SQLite for ease of development, it allows for a smooth transition to more robust databases like PostgreSQL as your project scales.
-
+<!--LLM-->
 ## Table of Contents
 
 - [Rapid Development Philosophy](#rapid-development-philosophy)
