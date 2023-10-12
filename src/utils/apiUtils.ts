@@ -96,7 +96,13 @@ export function sanitizeHeaders(headers: RequestHeaders): RequestHeaders {
 }
 
 export async function fetchOrThrow(input: RequestInfo, init?: RequestInit): Promise<Response> {
-    const response = await fetch(input, init);
+    const response = await fetch(input, {
+        ...init,
+        headers: {
+            "Content-Type": "application/json",
+            ...init?.headers
+        },
+    });
     if (!response.ok) {
         const errorMessage = `HTTP error: ${response.status} ${response.statusText}`;
         logger.log({
