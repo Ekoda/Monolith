@@ -18,6 +18,9 @@ fi
 
 echo -e "\n# api\nBASE_URL=http://localhost:3000\n\n# auth\nNEXTAUTH_URL=http://localhost:3000" >> .env
 
+NEXTAUTH_SECRET=$(openssl rand -base64 32)
+echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env
+
 echo "Enter your Google Client ID and Secret, or leave blank to skip:"
 read -p "Google Client ID: " google_client_id
 read -p "Google Client Secret: " google_client_secret
