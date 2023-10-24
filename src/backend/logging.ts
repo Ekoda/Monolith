@@ -12,7 +12,7 @@ export interface Logger {
     log: (entry: LogEntry) => Promise<void | Error>;
 }
 
-function appendBaseEntry(entry: LogEntry) {
+function appendBaseEntry(entry: LogEntry): LogEntry {
     return {
         ...entry,
         metadata: {

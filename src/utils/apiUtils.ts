@@ -1,5 +1,6 @@
 import { NextApiResponse } from "next";
 import {logger} from "@/backend/logging";
+import {HostInfo, LOCALHOST, PRODUCTION} from "@/services/apiService";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -95,7 +96,7 @@ export function sanitizeHeaders(headers: RequestHeaders): RequestHeaders {
     return sanitizedHeaders;
 }
 
-export async function fetchOrThrow(input: RequestInfo, init?: RequestInit): Promise<Response> {
+export async function fetchOrThrow(input: RequestInfo, init?: RequestInit, logError: boolean = false): Promise<Response> {
     const response = await fetch(input, {
         ...init,
         headers: {
@@ -105,24 +106,35 @@ export async function fetchOrThrow(input: RequestInfo, init?: RequestInit): Prom
     });
     if (!response.ok) {
         const errorMessage = `HTTP error: ${response.status} ${response.statusText}`;
-        logger.log({
-            level: "error",
-            message: errorMessage,
-            metadata: {
-                request: {
-                    method: init?.method || "GET",
-                    headers: sanitizeHeaders(init?.headers),
-                    body: init?.body,
-                },
-                response: {
-                    status: response.status,
-                    statusText: response.statusText,
-                    url: response.url,
-                    body: await response.text()
+        if (logError) {
+            logger.log({
+                level: "error",
+                message: errorMessage,
+                metadata: {
+                    request: {
+                        method: init?.method || "GET",
+                        headers: sanitizeHeaders(init?.headers),
+                        body: init?.body,
+                    },
+                    response: {
+                        status: response.status,
+                        statusText: response.statusText,
+                        url: response.url,
+                        body: await response.text()
+                    }
                 }
-            }
-        }).catch(console.error);
+            }).catch(console.error);
+        }
         throw new Error(errorMessage);
     }
     return response;
+}
+
+export function getHostInfo(environment: "test" | "development" | "production"): HostInfo {
+    switch (environment) {
+        case "test": return LOCALHOST;
+        case "development": return LOCALHOST;
+        case "production": return PRODUCTION;
+        default: throw new Error(`Unknown environment: ${environment}`);
+    }
 }

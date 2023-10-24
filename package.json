@@ -19,8 +19,7 @@
     "next": "13.5.4",
     "next-auth": "^4.23.2",
     "react": "^18",
-    "react-dom": "^18",
-    "react-fetch-hook": "^1.9.5"
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@types/jest": "^29.5.5",
