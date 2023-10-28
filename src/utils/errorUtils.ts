@@ -1,14 +1,3 @@
-import {LogEntry} from "@/backend/logging";
-
-export function errorEntry(error: Error, message?: string): LogEntry {
-    return {
-        level: "error",
-        message: message || error.message,
-        metadata: {
-            stackTrace: error.stack
-        }
-    }
-}
 
 export function assert(condition: boolean, errorMessage?: string): asserts condition {
     if (!condition) {

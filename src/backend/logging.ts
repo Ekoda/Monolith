@@ -1,9 +1,9 @@
 import {getCurrentTime} from "@/utils/timeUtils";
-import {errorEntry} from "@/utils/errorUtils";
 
 export interface LogEntry {
     level: "debug" | "info" | "warn" | "error";
     message: string;
+    error?: Error;
     metadata?: Record<string, any>;
     timestamp?: Date;
 }
@@ -17,6 +17,8 @@ function appendBaseEntry(entry: LogEntry): LogEntry {
         ...entry,
         metadata: {
             environment: process.env.NODE_ENV,
+            errorMessage: entry.error?.message,
+            errorStack: entry.error?.stack,
             ...entry.metadata
         },
     }
@@ -41,11 +43,15 @@ export function withLogging<T>(func: (...args: any[]) => T, ...args: any[]): T {
         return func(...args);
     } catch (e) {
         if (e instanceof Error) {
-            logger.log(errorEntry(e)).catch(console.error);
+            logger.log({
+                level: "error",
+                message: e.message,
+                error: e
+            }).catch(console.error);
         } else {
             logger.log({
                 level: "error",
-                message: "An unknown error occurred"
+                message: "An unknown error occurred",
             }).catch(console.error);
         }
         throw e;
