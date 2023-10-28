@@ -41,6 +41,7 @@ export function useFetch<T>(fetchFunction: () => Promise<T>, options?: UseFetchS
             setIsLoading(true);
             setError(null);
             initialized.current = true;
+
             fetchFunction()
                 .then(r => {
                     setData(r);

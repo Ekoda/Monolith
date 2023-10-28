@@ -31,7 +31,7 @@ describe("fetchOrThrow", () => {
         const mockResponse = { ok: false, status: 404, statusText: "Not Found" };
         fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 404, statusText: "Not Found" });
 
-        await expect(fetchOrThrow("/error-url")).rejects.toThrow("HTTP error: 404 Not Found");
+        await expect(fetchOrThrow("/error-url", {}, true)).rejects.toThrow("HTTP error: 404 Not Found");
         expect(logger.log).toHaveBeenCalledWith(
             expect.objectContaining({
                 level: "error",

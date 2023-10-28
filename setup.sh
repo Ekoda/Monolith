@@ -9,7 +9,7 @@ echo -e "# db" > .env.local
 
 if [[ $db_prompt == "y" ]]; then
     echo "DATABASE_URL=file:./dev.db" >> .env.local
-    npx prisma migrate dev --name init
+    npm run migrate:local
     echo "Created dev.db\n"
 else
     echo "DATABASE_URL=db-url-here" >> .env.local

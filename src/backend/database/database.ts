@@ -2,6 +2,11 @@ import { PrismaClient } from "@prisma/client";
 import {logger} from "@/backend/logging";
 
 const db = new PrismaClient({
+    datasources: {
+        db: {
+            url: process.env.DATABASE_URL,
+        },
+    },
     log: [
         {
             emit: "event",
