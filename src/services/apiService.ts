@@ -24,50 +24,46 @@ interface UseFetchServiceOptions<T> {
     onError?: (error: Error) => void;
 }
 
-export function useFetch<T>(fetchFunction: () => Promise<T>, options?: UseFetchServiceOptions<T>) {
-    const {
-        fetchOnMount = false,
-        onReceive,
-        onError
-    } = options || {};
+export function useFetch<T>(
+    fetchFunction: () => Promise<T>,
+    options?: UseFetchServiceOptions<T>
+) {
+    const { fetchOnMount = false, onReceive, onError } = options || {};
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
     const [data, setData] = useState<T | null>(null);
-    const initialized = useRef(false);
+    const fetchCountRef = useRef<number>(0);
 
     const trigger = useCallback(() => {
-        (async () => {
-            setIsLoading(true);
-            setError(null);
-            initialized.current = true;
+        setIsLoading(true);
+        setError(null);
 
-            fetchFunction()
-                .then(r => {
-                    setData(r);
-                    if (onReceive) {
-                        onReceive(r);
-                    }
-                })
-                .catch(e => {
-                    setError(e as Error);
-                    if (onError) {
-                        onError(e as Error);
-                    }
-                })
-                .finally(() => {
-                    initialized.current = false;
-                    setIsLoading(false);
-                });
+        fetchCountRef.current++;
 
-        })();
+        fetchFunction()
+            .then(response => {
+                setData(response);
+                if (onReceive) {
+                    onReceive(response);
+                }
+            })
+            .catch(err => {
+                setError(err as Error);
+                if (onError) {
+                    onError(err as Error);
+                }
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }, [fetchFunction, onReceive, onError]);
 
     useEffect(() => {
-        if (fetchOnMount && !data && !initialized.current) {
+        if (fetchOnMount && fetchCountRef.current === 0) {
             trigger();
         }
-    }, [trigger, fetchOnMount]);
+    }, [fetchOnMount, trigger]);
 
     return { isLoading, error, data, trigger };
 }
