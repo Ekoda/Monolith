@@ -20,28 +20,35 @@ export const PRODUCTION: HostInfo = {
 
 interface UseFetchServiceOptions<T> {
     fetchOnMount?: boolean; // Defaults to false if not specified
+    defaultArgs?: any[]; // Defaults to empty array if not specified
     onReceive?: (data: T) => void;
     onError?: (error: Error) => void;
 }
 
-export function useFetch<T>(
-    fetchFunction: () => Promise<T>,
+export function useFetch<T, Args extends any[]>(
+    fetchFunction: (...args: Args) => Promise<T>,
     options?: UseFetchServiceOptions<T>
 ) {
-    const { fetchOnMount = false, onReceive, onError } = options || {};
+    // @ts-ignore
+    const {
+        fetchOnMount = false,
+        onReceive,
+        onError,
+        defaultArgs = []
+    } = options || {};
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
     const [data, setData] = useState<T | null>(null);
     const fetchCountRef = useRef<number>(0);
 
-    const trigger = useCallback(() => {
+    const trigger = useCallback((...args: Args) => {
         setIsLoading(true);
         setError(null);
 
         fetchCountRef.current++;
 
-        fetchFunction()
+        fetchFunction(...args)
             .then(response => {
                 setData(response);
                 if (onReceive) {
@@ -61,9 +68,10 @@ export function useFetch<T>(
 
     useEffect(() => {
         if (fetchOnMount && fetchCountRef.current === 0) {
-            trigger();
+            // @ts-ignore
+            trigger(...defaultArgs);
         }
-    }, [fetchOnMount, trigger]);
+    }, [fetchOnMount, trigger, ...defaultArgs]);
 
     return { isLoading, error, data, trigger };
 }
