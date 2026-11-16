@@ -1,7 +1,6 @@
-import db from "../database/database"
-import {User} from ".prisma/client";
+import db from "@/backend/database/database";
+import {User} from "@prisma/client";
 import {getCurrentTime} from "@/utils/timeUtils";
-import { User as NextAuthUser} from "next-auth";
 
 
 export async function findUserById(id: string): Promise<User | null> {
@@ -12,12 +11,11 @@ export async function findUserByEmail(email: string): Promise<User | null> {
     return db.user.findUnique({where: {email}});
 }
 
-
-export async function createUser(user: NextAuthUser): Promise<User> {
+export async function createUser(email: string, name?: string | null): Promise<User> {
     return db.user.create({
         data: {
-            email: user.email as string,
-            name: user.name as string,
+            email,
+            name: name ?? null,
             lastLoginAt: getCurrentTime()
         }
     })
@@ -31,16 +29,20 @@ export async function updateUser(email: string, user: Partial<User>): Promise<Us
     )
 }
 
-export async function upsertUser(user: NextAuthUser): Promise<User> {
+/**
+ * Some providers (e.g. Apple) only send the name on the first login,
+ * so a missing name never overwrites one we already have.
+ */
+export async function upsertUser(email: string, name?: string | null): Promise<User> {
     return db.user.upsert({
-        where: {email: user.email as string},
+        where: {email},
         create: {
-            email: user.email as string,
-            name: user.name as string,
+            email,
+            name: name ?? null,
             lastLoginAt: getCurrentTime()
         },
         update: {
-            name: user.name as string,
+            ...(name ? {name} : {}),
             lastLoginAt: getCurrentTime()
         }
     })

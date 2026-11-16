@@ -24,13 +24,27 @@ function appendBaseEntry(entry: LogEntry): LogEntry {
     }
 }
 
+/**
+ * Default sink: one JSON line per entry on stdout/stderr, which Vercel (and most hosts)
+ * capture as structured logs. Swap this out for Axiom/Datadog/etc. when needed.
+ */
+function writeToConsole(entry: LogEntry): void {
+    // Error objects don't serialize (JSON.stringify gives {}); message/stack are already in metadata
+    const {error, ...rest} = entry;
+    const line = JSON.stringify(rest);
+    switch (entry.level) {
+        case "error": console.error(line); break;
+        case "warn": console.warn(line); break;
+        case "debug": console.debug(line); break;
+        default: console.log(line);
+    }
+}
+
 class AppLogger implements Logger {
     async log({timestamp = getCurrentTime(), ...entry}: LogEntry): Promise<void | Error> {
         try {
             const finalEntry = appendBaseEntry({...entry, timestamp});
-
-            // Implementation will go here
-
+            writeToConsole(finalEntry);
             return Promise.resolve();
         } catch (error) {
             return Promise.reject(new Error("Logging failed"));

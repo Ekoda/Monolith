@@ -1,6 +1,6 @@
 # Monolith Template
 <!--LLM-->
-This template provides a structured starting point for building a full-stack monolith application using Next.js, Prisma, and SQLite. It includes an organized backend, a Prisma db schema, and API endpoints structured under the pages directory. Initially configured with SQLite for ease of development, it allows for a smooth transition to more robust databases like PostgreSQL as your project scales.
+This template provides a structured starting point for building a full-stack monolith application using Next.js, Prisma, and PostgreSQL. It includes an organized backend, a Prisma db schema, and API endpoints structured under the pages directory. Local development runs Postgres in Docker; production can use any hosted Postgres (Vercel Postgres, Supabase, Neon, ...).
 <!--LLM-->
 ## Table of Contents
 
@@ -47,17 +47,25 @@ Run `setup.sh` to install dependencies and set up a sqlite db for development or
 
 ## Database Setup
 
-1. Ensure your `.env` file has the `DATABASE_URL` variable set to `file:./dev.db` for SQLite or to a PostgreSQL database URL for a more robust setup.
+The template uses PostgreSQL in every environment (SQLite can't run on Vercel's read-only filesystem, and Prisma can't switch provider per environment).
 
-2. Create an initial migration to set up the database schema:
+1. Start a local Postgres (or point `DATABASE_URL` in `.env.local` at any Postgres, e.g. Supabase or Neon):
     ```bash
-    npx prisma migrate dev --name init
+    npm run db:up
     ```
+    `.env.local`: `DATABASE_URL=postgresql://monolith:monolith@localhost:5432/monolith`
 
-3. Apply the migration, which generates the necessary tables and the Prisma Client based on your schema:
-   ```
-   npm run migrate 
-   ```
+2. After changing `schema.prisma`, create and apply a migration locally:
+    ```bash
+    npm run migrate:dev -- --name describe_your_change
+    ```
+    Commit the generated folder in `src/backend/database/migrations/`. Migrations are part of the code.
+
+3. In production, only ever apply committed migrations (never `migrate dev`):
+    ```bash
+    npm run migrate:deploy
+    ```
+    On Vercel you can run this as part of the build by setting the Build Command to `npm run migrate:deploy && npm run build`.
 
 ## Authentication
 
@@ -71,8 +79,8 @@ This template is pre-configured with NextAuth for Google authentication, located
     ```env
     # auth credentials
     NEXTAUTH_URL=http://localhost:3000
-    GOOGLE_CLIENT_ID=your-google-client-id
-    GOOGLE_CLIENT_SECRET=your-google-client-secret
+    GOOGLE_ID=your-google-client-id
+    GOOGLE_SECRET=your-google-client-secret
     ```
 
 ## Publish-Subscribe System

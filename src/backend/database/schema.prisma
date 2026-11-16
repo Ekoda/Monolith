@@ -5,14 +5,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// For poolers (Supabase/Neon on serverless): point DATABASE_URL at the pooled URL and
+// add `directUrl = env("DIRECT_URL")` with the direct URL so migrations bypass the pooler.
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id          String    @id @default(uuid()) @map("id")
-  name        String    @map("name")
+  name        String?   @map("name")
   email       String    @unique @map("email")
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")

@@ -1,22 +1,34 @@
 #!/bin/bash
+set -e
 
 npm install
 
-echo "Would you like to create a sqlite db for development?"
-read -p "(y/n) " db_prompt
-
-echo -e "# db" > .env.local
-
-if [[ $db_prompt == "y" ]]; then
-    echo "DATABASE_URL=file:./dev.db" >> .env.local
-    npm run migrate:local
-    echo "Created dev.db\n"
-else
-    echo "DATABASE_URL=db-url-here" >> .env.local
-    echo -e "\nSkipped creating dev.db. To use another database:\n1. Update the DATABASE_URL in the .env.local file.\n2. Update the db provider in the src/backend/database/prisma.schema file.\n"
+if [[ -f .env.local ]]; then
+    read -p ".env.local already exists. Overwrite it? (y/n) " overwrite_prompt
+    if [[ $overwrite_prompt != "y" ]]; then
+        echo "Keeping existing .env.local."
+        exit 0
+    fi
 fi
 
-echo -e "\n# api\nBASE_URL=http://localhost:3000\n\n# auth\nNEXTAUTH_URL=http://localhost:3000" >> .env.local
+echo "Start a local Postgres in Docker for development?"
+read -p "(y/n) " db_prompt
+
+echo "# db" > .env.local
+
+if [[ $db_prompt == "y" ]]; then
+    echo "DATABASE_URL=postgresql://monolith:monolith@localhost:5432/monolith" >> .env.local
+    npm run db:up
+    echo "Waiting for Postgres..."
+    until docker compose exec -T db pg_isready -U monolith > /dev/null 2>&1; do sleep 1; done
+    npm run migrate:dev
+    echo "Local Postgres is up and migrated."
+else
+    echo "DATABASE_URL=postgresql://user:password@host:5432/db" >> .env.local
+    echo -e "\nSkipped local db. Set DATABASE_URL in .env.local, then run: npm run migrate:dev\n"
+fi
+
+echo -e "\n# auth\nNEXTAUTH_URL=http://localhost:3000" >> .env.local
 
 NEXTAUTH_SECRET=$(openssl rand -base64 32)
 echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env.local

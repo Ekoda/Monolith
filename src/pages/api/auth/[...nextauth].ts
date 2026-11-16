@@ -12,13 +12,8 @@ export const authOptions: NextAuthOptions = {
         // ...add more providers here
     ],
     callbacks: {
-        async signIn({ user, account, profile }) {
-            if (!user.email) {
-                console.log("No email found in user object");
-                return false;
-            }
-            await handleSignIn(user, account, profile);
-            return true;
+        async signIn({ user, account }) {
+            return handleSignIn(user, account);
         },
     },
 };

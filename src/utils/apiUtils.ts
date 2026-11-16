@@ -57,14 +57,6 @@ export function conflict409(res: NextApiResponse, message?: string) {
     });
 }
 
-export function or404<T>(res: NextApiResponse, data: T): void | T {
-    return data == null ? notFound404(res) : data;
-}
-
-export function or403(res: NextApiResponse, condition: boolean, message?: string): void | boolean {
-    return condition || forbidden403(res, message);
-}
-
 type RequestHeaders = [string, string][] | Record<string, string> | Headers | undefined;
 
 export function sanitizeHeaders(headers: RequestHeaders): RequestHeaders {
