@@ -1,107 +1,131 @@
-# Monolith Template
+# Monolith
+
 <!--LLM-->
-This template provides a structured starting point for building a full-stack monolith application using Next.js, Prisma, and PostgreSQL. It includes an organized backend, a Prisma db schema, and API endpoints structured under the pages directory. Local development runs Postgres in Docker; production can use any hosted Postgres (Vercel Postgres, Supabase, Neon, ...).
+A full-stack starter for shipping an idea as a single app: Next.js (pages router) for the frontend and API, PostgreSQL + Prisma for data, NextAuth for sign-in, and MUI with a token-driven theme for the UI. Frontend, backend and database schema live in one repository and deploy as one unit.
 <!--LLM-->
-## Table of Contents
 
-- [Rapid Development Philosophy](#rapid-development-philosophy)
-- [Getting Started](#getting-started)
-- [Database Setup](#database-setup)
-- [Authentication](#authentication)
-- [Publish-Subscribe System](#publish-subscribe-system)
-- [Logging](#logging)
-- [Deployment](#deployment)
-- [Integrations](#integrations)
-- [Notes](#notes)
+**Stack:** Next.js · React · TypeScript · Prisma · PostgreSQL · NextAuth · MUI · Jest
 
-## Rapid Development Philosophy
+## Quick start
 
-The Monolith template facilitates rapid development, ideal for solo developers transitioning ideas into live applications swiftly. Its monorepo architecture consolidates backend and frontend into one repository, promoting:
+You need Node 20+ and Docker (for the local database).
 
-- **Unified Versioning:** Single repository, unified versioning, simplifying version control and rollback.
-- **Atomic Changes:** Enables coordinated updates across multiple components ensuring that changes in the backend and frontend are harmonized, simplifying the development and review processes.
-- **Shared Configurations and Libraries:** Easy sharing of common assets across backend and frontend, reducing redundancy.
-- **Single Build and Test Environment:** Straightforward CI/CD integrations for a seamless path from development to deployment.
-- **Clear Demarcation:** Defined separation between backend and frontend for focused development and easy navigation.
-- **Smooth Transition to Scalability:** Transition to robust databases like PostgreSQL and break the app upp with ease as your project scales.
+```bash
+bash setup.sh
+```
 
-Monolith lowers the threshold from idea to implementation, offering a structured foundation adaptable to evolving project needs, making it apt for solo developers or small teams intent on rapid development.
+```bash
+npm run dev
+```
 
-## Getting Started
+`setup.sh` installs dependencies, writes `.env.local`, starts Postgres in Docker, runs the migrations and asks for your Google OAuth keys (you can skip those). Then open [http://localhost:3000](http://localhost:3000).
 
-Run `setup.sh` to install dependencies and set up a sqlite db for development or follow the steps below to set up the project manually.
+<details>
+<summary>Manual setup</summary>
 
-1. **Install Dependencies:**
-    ```bash
-    npm install
-    ```
+1. `npm install`
+2. Create `.env.local`:
+   ```env
+   DATABASE_URL=postgresql://monolith:monolith@localhost:5432/monolith
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=   # openssl rand -base64 32
+   GOOGLE_ID=
+   GOOGLE_SECRET=
+   ```
+3. `npm run db:up` to start Postgres, then `npm run migrate:dev` to apply the migrations.
+4. `npm run dev`
 
-2. **Run Development Server:**
-    ```bash
-    npm run dev
-    ```
+</details>
 
-3. Open your browser and navigate to [http://localhost:3000](http://localhost:3000) to see the application in action. The page auto-updates as you make changes to the code.
+### Google sign-in
 
-4. Start editing by modifying `pages/index.tsx` and explore the structured backend within the `src/backend` directory.
+The app runs without it: every page is public unless it asks for a signed-in user. To turn sign-in on:
 
-## Database Setup
+1. In the [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create an **OAuth client ID** of type *Web application*.
+2. Add `http://localhost:3000/api/auth/callback/google` as an authorized redirect URI (plus your production URL later).
+3. Put the client ID and secret in `GOOGLE_ID` and `GOOGLE_SECRET` in `.env.local`.
 
-The template uses PostgreSQL in every environment (SQLite can't run on Vercel's read-only filesystem, and Prisma can't switch provider per environment).
+To add other providers (Apple, Facebook, email/password), register them in `src/pages/api/auth/[...nextauth].ts` and switch on the matching flag in `src/config/auth.ts`.
 
-1. Start a local Postgres (or point `DATABASE_URL` in `.env.local` at any Postgres, e.g. Supabase or Neon):
-    ```bash
-    npm run db:up
-    ```
-    `.env.local`: `DATABASE_URL=postgresql://monolith:monolith@localhost:5432/monolith`
+## Workflow
 
-2. After changing `schema.prisma`, create and apply a migration locally:
-    ```bash
-    npm run migrate:dev -- --name describe_your_change
-    ```
-    Commit the generated folder in `src/backend/database/migrations/`. Migrations are part of the code.
+**Day to day**
 
-3. In production, only ever apply committed migrations (never `migrate dev`):
-    ```bash
-    npm run migrate:deploy
-    ```
-    On Vercel you can run this as part of the build by setting the Build Command to `npm run migrate:deploy && npm run build`.
+```bash
+npm run db:up   # start Postgres (once per boot)
+```
 
-## Authentication
+```bash
+npm run dev     # app on http://localhost:3000
+```
 
-This template is pre-configured with NextAuth for Google authentication, located in the `[...nextauth].ts` file within the `pages/api/auth` directory. Follow these steps to enable Google authentication:
+```bash
+npm test        # Jest tests in src/tests
+```
 
-1. Navigate to the [Google Developer Console](https://console.developers.google.com/).
-2. Create or select an existing project.
-3. Navigate to "Credentials" on the sidebar, create credentials, and select "OAuth client ID".
-4. Configure the consent screen, set the application type to "Web application", and provide authorized JavaScript origins and redirect URIs.
-5. Obtain your "Client ID" and "Client Secret" and update the `.env` file with these credentials:
-    ```env
-    # auth credentials
-    NEXTAUTH_URL=http://localhost:3000
-    GOOGLE_ID=your-google-client-id
-    GOOGLE_SECRET=your-google-client-secret
-    ```
+```bash
+npm run lint
+```
 
-## Publish-Subscribe System
+**Adding a feature, end to end**
 
-Explore `src/backend/pubsub.ts` to understand the Publisher and Subscriber interfaces along with the implemented PubSub class. This design enables integration with different Pub/Sub service providers like Google Pub/Sub, RabbitMQ, etc., as your project scales.
+1. **Data:** edit `src/backend/database/schema.prisma`, then create a migration:
+   ```bash
+   npm run migrate:dev -- --name add_projects
+   ```
+   Commit the generated folder in `src/backend/database/migrations/`; migrations are part of the code.
+2. **Logic:** put database and domain logic in `src/backend/services/`.
+3. **API:** add a route in `src/pages/api/`. Wrap it in `withAuth` if it needs a signed-in user:
+   ```ts
+   export default withAuth(async (req, res, { user }) => {
+       return ok200(res, await findUserByEmail(user.email));
+   });
+   ```
+4. **Client:** add a fetch function in `src/services/apiService.ts` and call it from a page with the `useFetch` hook.
+5. **UI:** add a page in `src/pages/`. Pages are public by default; to make one sign-in only:
+   ```tsx
+   export default function Dashboard() { /* ... */ }
+   Dashboard.requireAuth = true;
+   ```
 
-## Logging
+**Restyling**
 
-The `src/backend/logging.ts` file encapsulates structured logging logic and interfaces. This modular design allows for integration with various logging libraries or services as needed.
+The whole look is driven by a few tokens at the top of `src/styles/theme.ts`: brand colour, corner radius, font and the grey scale. Change those first; component-level tweaks live further down the same file. Light mode is the default, and the navbar has a dark-mode toggle.
 
-## Integrations
+**Deploying**
 
-Integrations with external services or APIs are organized in a modular and isolated manner, allowing for clearer code separation and easier management. Each integration is structured within its own directory under the src/backend/integrations directory. This way, the integrations are kept separate from other backend logic, promoting cleaner and more maintainable code.
+Any Node host works; Vercel is the simplest. Use any hosted Postgres (Neon, Supabase, Vercel Postgres) and set the same env vars there, with `NEXTAUTH_URL` set to your public URL. Apply migrations as part of the build:
 
-## Deployment
+```bash
+npm run migrate:deploy && npm run build
+```
 
-Deploy your Next.js app on the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) for a seamless experience. Refer to the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Never run `migrate:dev` against production. To migrate production from your machine, put its env vars in `.env.production` and run `npm run migrate:deploy:production`.
+
+## Where things live
+
+```
+src/
+├── pages/                 Routes. Each file is a page; _app.tsx wires up theme, session and navbar
+│   └── api/               API routes (auth, health, users)
+├── components/            Shared UI: Navbar, Logo, LoginBox, SessionWrapper, ColorModeToggle
+├── styles/theme.ts        Design tokens and MUI theme (light + dark)
+├── services/apiService.ts Client-side fetch functions and the useFetch hook
+├── config/                App title and which sign-in methods are enabled
+├── backend/
+│   ├── auth/withAuth.ts   Guard for API routes that need a signed-in user
+│   ├── controllers/       Request handling shared by API routes
+│   ├── services/          Database and domain logic
+│   ├── database/          Prisma schema, migrations, client (generated/ is git-ignored)
+│   ├── integrations/      One folder per third-party API, with an example
+│   ├── pubsub.ts          Publish/subscribe interface (swap in Google Pub/Sub, RabbitMQ, ...)
+│   └── logging.ts         Structured logger interface
+├── utils/                 Small helpers (API responses, errors, time)
+└── tests/                 Jest tests
+```
+
+Configuration lives at the root: `prisma.config.ts` (schema and migration paths), `docker-compose.yml` (local Postgres) and `.env.local` (secrets, not committed).
 
 ## Notes
 
-Monolith, has been primarily crafted for personal use, based on my familiarity and comfort with certain technologies, including but not limited to Next.js, Prisma, and SQLite. While it serves as a structured starting point for building a full-stack monolith application, the choice of technologies and the architecture reflect personal preferences and experiences. As such, while others may find Monolith useful, it is advisable to have a good understanding of the included technologies and frameworks before diving in.
-
-This documentation provides an overview and setup instructions for the Monolith Template. For a deeper understanding, feel free to explore the directory structure and the code.
-
+Monolith started as a personal template and reflects personal choices of tools. It aims to stay small and easy to read: take what's useful, delete what isn't.
