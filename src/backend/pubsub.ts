@@ -1,5 +1,5 @@
 interface Message {
-    data: any;
+    data: unknown;
     attributes?: Record<string, string>;
     messageId?: string;
     publishTime?: string;

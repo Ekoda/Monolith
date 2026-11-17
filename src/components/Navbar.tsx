@@ -151,7 +151,7 @@ const Navbar = () => {
                             >
                                 {settings.map((setting) => (
                                     <MenuItem key={setting.key} onClick={setting.onClick}>
-                                        <Typography textAlign="center">{setting.key}</Typography>
+                                        <Typography sx={{textAlign: "center"}}>{setting.key}</Typography>
                                     </MenuItem>
                                 ))}
                             </Menu>

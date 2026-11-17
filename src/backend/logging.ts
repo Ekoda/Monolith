@@ -4,7 +4,7 @@ export interface LogEntry {
     level: "debug" | "info" | "warn" | "error";
     message: string;
     error?: Error;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
     timestamp?: Date;
 }
 
@@ -52,7 +52,7 @@ class AppLogger implements Logger {
     }
 }
 
-export function withLogging<T>(func: (...args: any[]) => T, ...args: any[]): T {
+export function withLogging<A extends unknown[], T>(func: (...args: A) => T, ...args: A): T {
     try {
         return func(...args);
     } catch (e) {

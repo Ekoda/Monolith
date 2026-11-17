@@ -11,16 +11,16 @@ describe("errorUtils", () => {
         });
 
         test("should throw an error when value is null", () => {
-            expect(() => validatePresent(null)).toThrowError("Value is null or undefined");
+            expect(() => validatePresent(null)).toThrow("Value is null or undefined");
         });
 
         test("should throw an error when value is undefined", () => {
-            expect(() => validatePresent(undefined)).toThrowError("Value is null or undefined");
+            expect(() => validatePresent(undefined)).toThrow("Value is null or undefined");
         });
 
         test("should throw a custom error message when provided", () => {
             const customMessage = "Custom Error Message";
-            expect(() => validatePresent(null, customMessage)).toThrowError(customMessage);
+            expect(() => validatePresent(null, customMessage)).toThrow(customMessage);
         });
     });
 
@@ -30,12 +30,12 @@ describe("errorUtils", () => {
         });
 
         test("should throw an error when condition is false", () => {
-            expect(() => assert(false)).toThrowError("Assertion failed");
+            expect(() => assert(false)).toThrow("Assertion failed");
         });
 
         test("should throw a custom error message when provided", () => {
             const customMessage = "Custom Assertion Error Message";
-            expect(() => assert(false, customMessage)).toThrowError(customMessage);
+            expect(() => assert(false, customMessage)).toThrow(customMessage);
         });
     });
 
@@ -45,12 +45,12 @@ describe("errorUtils", () => {
         });
 
         test("should throw an error when types do not match", () => {
-            expect(() => checkType<number>("42", "number")).toThrowError("Expected number, got string");
+            expect(() => checkType<number>("42", "number")).toThrow("Expected number, got string");
         });
 
         test("should throw a custom error message when provided", () => {
             const customMessage = "Custom Type Error Message";
-            expect(() => checkType<number>("42", "number", customMessage)).toThrowError(customMessage);
+            expect(() => checkType<number>("42", "number", customMessage)).toThrow(customMessage);
         });
     });
 
@@ -63,13 +63,13 @@ describe("errorUtils", () => {
 
         test("should retry the function the specified number of times on failure", async () => {
             const mockFn = jest.fn(() => Promise.reject(new Error("Temporary failure")));
-            await expect(retry(mockFn, 3)).rejects.toThrowError("All 3 retry attempts failed");
+            await expect(retry(mockFn, 3)).rejects.toThrow("All 3 retry attempts failed");
             expect(mockFn).toHaveBeenCalledTimes(3);
         });
 
         test("should throw the last error when all retries fail", async () => {
             const mockFn = jest.fn(() => Promise.reject(new Error("Temporary failure")));
-            await expect(retry(mockFn)).rejects.toThrowError("Last error: Error: Temporary failure");
+            await expect(retry(mockFn)).rejects.toThrow("Last error: Error: Temporary failure");
         });
     });
 

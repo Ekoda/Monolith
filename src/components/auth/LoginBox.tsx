@@ -4,7 +4,6 @@ import {Apple, Facebook, Google} from "@mui/icons-material";
 import {TITLE} from "@/config/constants";
 import {standardLogin, googleLogin, appleLogin, facebookLogin} from "@/config/auth";
 import {signIn, useSession} from "next-auth/react";
-;
 
 export default function LoginBox() {
     const [email, setEmail] = useState<string>("");
@@ -30,9 +29,9 @@ export default function LoginBox() {
                                e.preventDefault();
                                // send login request
                            }}>
-                        <TextField required InputLabelProps={{shrink: true}} label="Email" type={"email"} value={email}
+                        <TextField required slotProps={{inputLabel: {shrink: true}}} label="Email" type={"email"} value={email}
                                    onChange={e => setEmail(e.target.value)} variant="outlined" autoComplete={"email"}/>
-                        <TextField required InputLabelProps={{shrink: true}} label="Password" variant="outlined"
+                        <TextField required slotProps={{inputLabel: {shrink: true}}} label="Password" variant="outlined"
                                    value={password} onChange={e => setPassword(e.target.value)}
                                    autoComplete={"password"} type={"password"}/>
                         <Button type={"submit"} style={{marginBottom: "10px"}} variant="contained" disabled={isLoading}>Sign in</Button>

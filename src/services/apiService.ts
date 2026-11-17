@@ -18,23 +18,22 @@ export const PRODUCTION: HostInfo = {
     baseUrl: "example.com"
 }
 
-interface UseFetchServiceOptions<T> {
+interface UseFetchServiceOptions<T, Args extends unknown[]> {
     fetchOnMount?: boolean; // Defaults to false if not specified
-    defaultArgs?: any[]; // Defaults to empty array if not specified
+    defaultArgs?: Args; // Args passed on mount when fetchOnMount is true
     onReceive?: (data: T) => void;
     onError?: (error: Error) => void;
 }
 
-export function useFetch<T, Args extends any[]>(
+export function useFetch<T, Args extends unknown[]>(
     fetchFunction: (...args: Args) => Promise<T>,
-    options?: UseFetchServiceOptions<T>
+    options?: UseFetchServiceOptions<T, Args>
 ) {
-    // @ts-ignore
     const {
         fetchOnMount = false,
         onReceive,
         onError,
-        defaultArgs = []
+        defaultArgs = [] as unknown as Args
     } = options || {};
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -68,7 +67,6 @@ export function useFetch<T, Args extends any[]>(
 
     useEffect(() => {
         if (fetchOnMount && fetchCountRef.current === 0) {
-            // @ts-ignore
             trigger(...defaultArgs);
         }
     }, [fetchOnMount, trigger, ...defaultArgs]);

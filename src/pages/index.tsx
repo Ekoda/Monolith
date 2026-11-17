@@ -24,14 +24,14 @@ export default function Home({ ...props }) {
             </Head>
 
             <Container>
-                <Box mt={5} textAlign="center">
-                    <Typography variant="h4" mb={5}>
+                <Box sx={{mt: 5, textAlign: "center"}}>
+                    <Typography variant="h4" sx={{mb: 5}}>
                         Example
                     </Typography>
                     <Button variant={"contained"} onClick={() => user.trigger()}>
                         Load User
                     </Button>
-                    <Box mt={3}>
+                    <Box sx={{mt: 3}}>
                         {user.isLoading ? (
                             <CircularProgress />
                         ) : user.error ? (

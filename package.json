@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "postinstall": "prisma generate",
     "db:up": "docker compose up -d db",
     "migrate:dev": "dotenv -e .env.local -- prisma migrate dev",
@@ -15,29 +15,29 @@
     "test": "jest"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.14.11",
-    "@mui/material": "^5.14.11",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.5.0",
+    "@mui/material": "^9.5.0",
     "@prisma/client": "^5.3.1",
     "dotenv-cli": "^7.3.0",
-    "next": "13.5.4",
-    "next-auth": "^4.23.2",
-    "react": "^18",
-    "react-dom": "^18"
+    "next": "^16.4.6",
+    "next-auth": "^4.24.15",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.5",
-    "@types/next-auth": "^3.15.0",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "13.5.4",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.6",
+    "jest": "^30.5.2",
     "jest-fetch-mock": "^3.0.3",
     "prisma": "^5.3.1",
-    "ts-jest": "^29.1.1",
-    "typescript": "^5"
+    "ts-jest": "^29.4.15",
+    "typescript": "^6.0.3"
   },
   "prisma": {
     "schema": "src/backend/database/schema.prisma"
