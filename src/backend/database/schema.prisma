@@ -2,14 +2,16 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "./generated/prisma"
+  // CommonJS so Jest (ts-jest) can load the client in tests; Next.js works with either format
+  moduleFormat = "cjs"
 }
 
-// For poolers (Supabase/Neon on serverless): point DATABASE_URL at the pooled URL and
-// add `directUrl = env("DIRECT_URL")` with the direct URL so migrations bypass the pooler.
+// The connection URL lives in prisma.config.ts (CLI/migrations) and database.ts (app runtime).
+// For poolers (Supabase/Neon on serverless): give the app the pooled URL and the CLI the direct URL.
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {

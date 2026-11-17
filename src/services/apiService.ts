@@ -1,7 +1,7 @@
-import {User} from "@prisma/client";
+import type {User} from "@/backend/database/generated/prisma/browser";
 import {System} from "@/pages/_app";
 import {useCallback, useEffect, useRef, useState} from "react";
-import {fetchOrThrow} from "@/utils/apiUtils";
+import {fetchJson} from "@/utils/apiUtils";
 
 
 export type HostInfo = {
@@ -75,15 +75,6 @@ export function useFetch<T, Args extends unknown[]>(
 }
 
 
-function getBaseHeaders() {
-    return {
-        "Content-Type": "application/json"
-    }
-}
-
 export function fetchUser(system: System): Promise<User> {
-    return fetchOrThrow(`${system.host}/api/users/current`, {
-        method: "GET",
-        headers: getBaseHeaders()
-    }).then(r => r.json());
+    return fetchJson<User>(`${system.host}/api/users/current`);
 }

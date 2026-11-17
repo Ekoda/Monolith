@@ -10,5 +10,5 @@ export default defineConfig([
             quotes: ["warn", "double"],
         },
     },
-    globalIgnores([".next/**", "out/**", "build/**", "coverage/**", "next-env.d.ts", ".sqlite-legacy/**"]),
+    globalIgnores([".next/**", "out/**", "build/**", "coverage/**", "next-env.d.ts", ".sqlite-legacy/**", "src/backend/database/generated/**"]),
 ]);

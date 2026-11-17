@@ -1,6 +1,6 @@
 import fetchMock from "jest-fetch-mock";
 import {logger} from "@/backend/logging";
-import {fetchOrThrow, sanitizeHeaders} from "@/utils/apiUtils";
+import {fetchJson, fetchOrThrow, HttpError, sanitizeHeaders} from "@/utils/apiUtils";
 
 fetchMock.enableMocks();
 
@@ -10,6 +10,10 @@ jest.mock("@/backend/logging", () => ({
     },
 }));
 
+function lastRequestInit(): RequestInit {
+    return fetchMock.mock.calls[fetchMock.mock.calls.length - 1][1] as RequestInit;
+}
+
 describe("fetchOrThrow", () => {
 
     beforeEach(() => {
@@ -18,8 +22,7 @@ describe("fetchOrThrow", () => {
     });
 
     it("returns the response when the status code indicates success", async () => {
-        const mockResponse = { ok: true, status: 200 };
-        fetchMock.mockResponseOnce(JSON.stringify(mockResponse));
+        fetchMock.mockResponseOnce(JSON.stringify({ok: true}));
 
         const response = await fetchOrThrow("/success-url");
 
@@ -27,19 +30,86 @@ describe("fetchOrThrow", () => {
         expect(response.status).toBe(200);
     });
 
-    it("logs an error and throws when the status code indicates an error", async () => {
-        const mockResponse = { ok: false, status: 404, statusText: "Not Found" };
-        fetchMock.mockResponseOnce(JSON.stringify(mockResponse), { status: 404, statusText: "Not Found" });
+    it("throws an HttpError with status and parsed JSON body", async () => {
+        fetchMock.mockResponseOnce(JSON.stringify({error: "User not found"}), {
+            status: 404, statusText: "Not Found", headers: {"Content-Type": "application/json"}
+        });
 
-        await expect(fetchOrThrow("/error-url", {}, true)).rejects.toThrow("HTTP error: 404 Not Found");
-        expect(logger.log).toHaveBeenCalledWith(
-            expect.objectContaining({
-                level: "error",
-                message: "HTTP error: 404 Not Found",
-            })
-        );
+        const error = await fetchOrThrow("/missing").catch(e => e);
+
+        expect(error).toBeInstanceOf(HttpError);
+        expect(error.status).toBe(404);
+        expect(error.body).toEqual({error: "User not found"});
+        expect(error.message).toBe("HTTP error: 404 Not Found - User not found");
     });
 
+    it("logs failures only when logError is set, without the request body", async () => {
+        fetchMock.mockResponse("boom", {status: 500, statusText: "Internal Server Error"});
+
+        await expect(fetchOrThrow("/a")).rejects.toThrow(HttpError);
+        expect(logger.log).not.toHaveBeenCalled();
+
+        await expect(fetchOrThrow("/a", {
+            method: "POST",
+            body: JSON.stringify({password: "hunter2"}),
+            headers: {authorization: "Bearer secret"},
+            logError: true,
+        })).rejects.toThrow("HTTP error: 500 Internal Server Error");
+
+        const entry = (logger.log as jest.Mock).mock.calls[0][0];
+        expect(entry.level).toBe("error");
+        expect(entry.metadata.request.body).toBeUndefined();
+        expect(entry.metadata.request.headers.get("authorization")).toBe("***");
+        expect(entry.metadata.response.body).toBe("boom");
+    });
+
+    it("sets JSON Content-Type for string bodies only", async () => {
+        fetchMock.mockResponse("{}");
+
+        await fetchOrThrow("/json", {method: "POST", body: JSON.stringify({a: 1})});
+        expect(new Headers(lastRequestInit().headers).get("Content-Type")).toBe("application/json");
+
+        await fetchOrThrow("/form", {method: "POST", body: new FormData()});
+        expect(new Headers(lastRequestInit().headers).get("Content-Type")).toBeNull();
+
+        await fetchOrThrow("/get");
+        expect(new Headers(lastRequestInit().headers).get("Content-Type")).toBeNull();
+    });
+
+    it("keeps caller headers of any shape, including a Headers instance", async () => {
+        fetchMock.mockResponse("{}");
+
+        await fetchOrThrow("/h", {headers: new Headers({"X-Trace": "abc"}), body: "{}", method: "POST"});
+        const sent = new Headers(lastRequestInit().headers);
+        expect(sent.get("X-Trace")).toBe("abc");
+        expect(sent.get("Content-Type")).toBe("application/json");
+
+        await fetchOrThrow("/h", {headers: {"Content-Type": "text/plain"}, body: "hi", method: "POST"});
+        expect(new Headers(lastRequestInit().headers).get("Content-Type")).toBe("text/plain");
+    });
+
+    it("aborts after timeoutMs", async () => {
+        fetchMock.mockResponseOnce((req) => new Promise((resolve, reject) => {
+            req.signal.addEventListener("abort", () => reject(req.signal.reason));
+            setTimeout(() => resolve("{}"), 1000);
+        }));
+
+        await expect(fetchOrThrow("/slow", {timeoutMs: 20})).rejects.toThrow();
+    });
+});
+
+describe("fetchJson", () => {
+    beforeEach(() => fetchMock.resetMocks());
+
+    it("parses JSON", async () => {
+        fetchMock.mockResponseOnce(JSON.stringify({id: 1}));
+        await expect(fetchJson<{id: number}>("/x")).resolves.toEqual({id: 1});
+    });
+
+    it("returns undefined for an empty body", async () => {
+        fetchMock.mockResponseOnce("", {status: 204});
+        await expect(fetchJson("/x")).resolves.toBeUndefined();
+    });
 });
 
 describe("sanitizeHeaders", () => {
@@ -48,56 +118,48 @@ describe("sanitizeHeaders", () => {
         expect(sanitizeHeaders(undefined)).toBeUndefined();
     });
 
-    describe("when headers is an instance of Headers", () => {
-        let headers: Headers;
-
-        beforeEach(() => {
-            headers = new Headers({
-                Authorization: "Bearer token",
-                Cookie: "session_id=abc123",
-                "Content-Type": "application/json"
-            });
+    it("redacts a Headers instance without mutating it", () => {
+        const headers = new Headers({
+            Authorization: "Bearer token",
+            Cookie: "session_id=abc123",
+            "Content-Type": "application/json"
         });
 
-        it("should sanitize sensitive headers", () => {
-            const sanitizedHeaders = sanitizeHeaders(headers) as Headers;
-            expect(sanitizedHeaders.get("Authorization")).toBe("***");
-            expect(sanitizedHeaders.get("Cookie")).toBe("***");
-            expect(sanitizedHeaders.get("Content-Type")).toBe("application/json");
-        });
+        const sanitized = sanitizeHeaders(headers) as Headers;
+
+        expect(sanitized.get("Authorization")).toBe("***");
+        expect(sanitized.get("Cookie")).toBe("***");
+        expect(sanitized.get("Content-Type")).toBe("application/json");
+        expect(headers.get("Authorization")).toBe("Bearer token");
     });
 
-    describe("when headers is an array", () => {
-        const headers = [
+    it("redacts an array of headers", () => {
+        const headers: [string, string][] = [
             ["Authorization", "Bearer token"],
             ["Cookie", "session_id=abc123"],
             ["Content-Type", "application/json"]
         ];
 
-        it("should sanitize sensitive headers", () => {
-            const sanitizedHeaders = sanitizeHeaders(headers as [string, string][]);
-            expect(sanitizedHeaders).toEqual([
-                ["Authorization", "***"],
-                ["Cookie", "***"],
-                ["Content-Type", "application/json"]
-            ]);
-        });
+        expect(sanitizeHeaders(headers)).toEqual([
+            ["Authorization", "***"],
+            ["Cookie", "***"],
+            ["Content-Type", "application/json"]
+        ]);
     });
 
-    describe("when headers is a Record<string, string>", () => {
+    it("redacts a record case-insensitively", () => {
         const headers = {
-            Authorization: "Bearer token",
+            authorization: "Bearer token",
+            "X-API-Key": "key",
             Cookie: "session_id=abc123",
             "Content-Type": "application/json"
         };
 
-        it("should sanitize sensitive headers", () => {
-            const sanitizedHeaders = sanitizeHeaders(headers);
-            expect(sanitizedHeaders).toEqual({
-                Authorization: "***",
-                Cookie: "***",
-                "Content-Type": "application/json"
-            });
+        expect(sanitizeHeaders(headers)).toEqual({
+            authorization: "***",
+            "X-API-Key": "***",
+            Cookie: "***",
+            "Content-Type": "application/json"
         });
     });
 

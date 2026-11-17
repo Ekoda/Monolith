@@ -19,10 +19,12 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.5.0",
     "@mui/material": "^9.5.0",
-    "@prisma/client": "^5.3.1",
+    "@prisma/adapter-pg": "^7.10.1",
+    "@prisma/client": "^7.10.1",
     "dotenv-cli": "^7.3.0",
     "next": "^16.4.6",
     "next-auth": "^4.24.15",
+    "pg": "^8.23.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
@@ -35,12 +37,9 @@
     "eslint-config-next": "^16.4.6",
     "jest": "^30.5.2",
     "jest-fetch-mock": "^3.0.3",
-    "prisma": "^5.3.1",
+    "prisma": "^7.10.1",
     "ts-jest": "^29.4.15",
     "typescript": "^6.0.3"
-  },
-  "prisma": {
-    "schema": "src/backend/database/schema.prisma"
   },
   "jest": {
     "preset": "ts-jest",

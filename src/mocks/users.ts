@@ -1,4 +1,4 @@
-import {User} from "@prisma/client";
+import type {User} from "@/backend/database/generated/prisma/browser";
 
 const users: User[] = [
     {

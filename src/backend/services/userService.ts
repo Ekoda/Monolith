@@ -1,5 +1,5 @@
 import db from "@/backend/database/database";
-import {User} from "@prisma/client";
+import type {User} from "@/backend/database/generated/prisma/client";
 import {getCurrentTime} from "@/utils/timeUtils";
 
 
