@@ -1,1 +1,1 @@
-export const TITLE = "Fullstack Template"
+export const TITLE = "Monolith"

@@ -1,11 +1,16 @@
 import * as React from "react";
+import NextLink from "next/link";
+import {useRouter} from "next/router";
 import {
-    AppBar, Avatar, Backdrop, Box, Button, CircularProgress, Container,
-    IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography, Link
+    AppBar, Avatar, Backdrop, Box, Button, CircularProgress, Container, Divider,
+    IconButton, ListItemIcon, Menu, MenuItem, Skeleton, Stack, Toolbar, Typography
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import LoginOutlined from "@mui/icons-material/LoginOutlined";
+import LogoutOutlined from "@mui/icons-material/LogoutOutlined";
 import {signOut, useSession} from "next-auth/react";
-import {TITLE} from "@/config/constants";
+import Logo from "@/components/Logo";
+import ColorModeToggle from "@/components/ColorModeToggle";
 
 const pages = [
     { name: "Home", path: "/" },
@@ -13,149 +18,137 @@ const pages = [
 ];
 
 const Navbar = () => {
+    const router = useRouter();
     const [logoutTriggered, setLogoutTriggered] = React.useState(false);
     const authSession = useSession();
-    const userImage = authSession.data?.user?.image;
-    const userName = authSession.data?.user?.name;
-
-    const settings = [
-        {
-            key: "Logout",
-            onClick: () => {
-                setLogoutTriggered(true);
-                signOut().then(r => setLogoutTriggered(false));
-            }
-        }
-    ];
+    const user = authSession.data?.user;
+    const isSignedIn = authSession.status === "authenticated";
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
-
-    const handleOpenUserMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorElUser(event.currentTarget);
-    };
-
-    const handleCloseNavMenu = () => {
-        setAnchorElNav(null);
-    };
-
-    const handleCloseUserMenu = () => {
+    const handleLogout = () => {
         setAnchorElUser(null);
+        setLogoutTriggered(true);
+        signOut().finally(() => setLogoutTriggered(false));
     };
+
+    const isActive = (path: string) => router.pathname === path;
 
     return (
         <>
             <Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={logoutTriggered}>
                 <CircularProgress color="inherit" />
             </Backdrop>
-            <AppBar component={"nav"} variant={"outlined"} elevation={0} sx={{backgroundColor: "transparent", position: "static"}}>
-                <Container maxWidth="xl">
-                    <Toolbar disableGutters>
-                        <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+            <AppBar component="nav" position="sticky">
+                <Container maxWidth="lg">
+                    <Toolbar disableGutters sx={{ gap: 1, minHeight: { xs: 60 } }}>
+                        {/* Mobile menu */}
+                        <Box sx={{ display: { xs: "flex", md: "none" } }}>
                             <IconButton
-                                size="large"
-                                aria-label="menu"
-                                aria-controls="menu-appbar"
+                                size="small"
+                                aria-label="Open navigation"
+                                aria-controls="nav-menu"
                                 aria-haspopup="true"
-                                onClick={handleOpenNavMenu}
-                                color="inherit"
+                                onClick={(e) => setAnchorElNav(e.currentTarget)}
+                                sx={{ color: "text.secondary" }}
                             >
                                 <MenuIcon />
                             </IconButton>
                             <Menu
-                                id="menu-appbar"
+                                id="nav-menu"
                                 anchorEl={anchorElNav}
-                                anchorOrigin={{
-                                    vertical: "bottom",
-                                    horizontal: "left",
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: "top",
-                                    horizontal: "left",
-                                }}
                                 open={Boolean(anchorElNav)}
-                                onClose={handleCloseNavMenu}
-                                sx={{
-                                    display: { xs: "block", md: "none" },
-                                }}
+                                onClose={() => setAnchorElNav(null)}
+                                slotProps={{ paper: { sx: { minWidth: 180 } } }}
                             >
                                 {pages.map((page) => (
-                                    <MenuItem key={page.name}>
-                                        <Link  underline={"none"}
-                                               color={"secondary"}
-                                               href={page.path}
-                                               sx={{
-                                                   color: "inherit",
-                                                   "&:visited": {
-                                                       color: "inherit"
-                                                   }
-                                               }}
-                                        >{page.name}</Link>
+                                    <MenuItem
+                                        key={page.name}
+                                        component={NextLink}
+                                        href={page.path}
+                                        selected={isActive(page.path)}
+                                        onClick={() => setAnchorElNav(null)}
+                                    >
+                                        {page.name}
                                     </MenuItem>
                                 ))}
                             </Menu>
                         </Box>
-                        <Typography
-                            variant="h6"
-                            noWrap
-                            component="a"
-                            href="/"
-                            sx={{
-                                mr: 2,
-                                display: { xs: "none", md: "flex" },
-                                fontFamily: "Verdana",
-                                fontWeight: 200,
-                                color: "inherit",
-                                textDecoration: "none",
-                            }}
-                        >
-                            {TITLE}
-                        </Typography>
-                        <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+
+                        <Box component={NextLink} href="/" sx={{ textDecoration: "none", color: "text.primary", mr: 3 }}>
+                            <Logo />
+                        </Box>
+
+                        {/* Desktop links */}
+                        <Stack direction="row" spacing={0.5} sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                             {pages.map((page) => (
                                 <Button
                                     key={page.name}
+                                    component={NextLink}
                                     href={page.path}
-                                    sx={{ my: 2, color: "white", display: "block" }}
+                                    size="small"
+                                    color="inherit"
+                                    sx={{
+                                        px: 1.5,
+                                        color: isActive(page.path) ? "text.primary" : "text.secondary",
+                                        bgcolor: isActive(page.path) ? "action.selected" : "transparent",
+                                        "&:hover": { color: "text.primary", bgcolor: "action.hover" },
+                                    }}
                                 >
                                     {page.name}
                                 </Button>
                             ))}
-                        </Box>
-                        <Box sx={{ flexGrow: 0 }}>
-                            <Tooltip title="Open settings">
-                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="You" src={userImage as string} sx={{ width: 50, height: 50 }} />
-                                </IconButton>
-                            </Tooltip>
-                            <Menu
-                                sx={{ mt: "45px" }}
-                                id="menu-appbar"
-                                anchorEl={anchorElUser}
-                                anchorOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
-                                }}
-                                open={Boolean(anchorElUser)}
-                                onClose={handleCloseUserMenu}
-                            >
-                                {settings.map((setting) => (
-                                    <MenuItem key={setting.key} onClick={setting.onClick}>
-                                        <Typography sx={{textAlign: "center"}}>{setting.key}</Typography>
-                                    </MenuItem>
-                                ))}
-                            </Menu>
-                        </Box>
+                        </Stack>
+                        <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }} />
+
+                        <ColorModeToggle />
+
+                        <IconButton
+                            onClick={(e) => setAnchorElUser(e.currentTarget)}
+                            aria-label="Account menu"
+                            sx={{ p: 0.5, borderRadius: "50%" }}
+                        >
+                            {authSession.status === "loading" ? (
+                                <Skeleton variant="circular" width={32} height={32} />
+                            ) : (
+                                <Avatar alt={user?.name ?? "Guest"} src={user?.image ?? undefined} sx={{ width: 32, height: 32 }} />
+                            )}
+                        </IconButton>
+                        <Menu
+                            id="account-menu"
+                            anchorEl={anchorElUser}
+                            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                            transformOrigin={{ vertical: "top", horizontal: "right" }}
+                            open={Boolean(anchorElUser)}
+                            onClose={() => setAnchorElUser(null)}
+                            slotProps={{ paper: { sx: { minWidth: 220 } } }}
+                        >
+                            <Box sx={{ px: 1.5, py: 1, maxWidth: 260 }}>
+                                <Typography variant="subtitle2" noWrap>
+                                    {isSignedIn ? (user?.name ?? "Signed in") : "You're browsing as a guest"}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: "text.secondary" }} noWrap={isSignedIn}>
+                                    {isSignedIn ? user?.email : "Sign in to access your account."}
+                                </Typography>
+                            </Box>
+                            <Divider sx={{ my: 0.5 }} />
+                            {isSignedIn ? (
+                                <MenuItem onClick={handleLogout}>
+                                    <ListItemIcon><LogoutOutlined fontSize="small" /></ListItemIcon>
+                                    Sign out
+                                </MenuItem>
+                            ) : (
+                                <MenuItem
+                                    component={NextLink}
+                                    href={router.pathname === "/login" ? "/login" : `/login?callbackUrl=${encodeURIComponent(router.asPath)}`}
+                                    onClick={() => setAnchorElUser(null)}
+                                >
+                                    <ListItemIcon><LoginOutlined fontSize="small" /></ListItemIcon>
+                                    Sign in
+                                </MenuItem>
+                            )}
+                        </Menu>
                     </Toolbar>
                 </Container>
             </AppBar>

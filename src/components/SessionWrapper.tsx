@@ -4,23 +4,19 @@ import PageLoading from "@/components/PageLoading";
 import {ReactNode} from "react";
 import Navbar from "@/components/Navbar";
 
-export default function SessionWrapper({ children }: {children: ReactNode}) {
+/**
+ * Wraps every page with the navbar. Pages are public by default;
+ * a page opts into requiring a signed-in user with `Page.requireAuth = true`.
+ */
+export default function SessionWrapper({ children, requireAuth = false }: { children: ReactNode, requireAuth?: boolean }) {
     const { status } = useSession();
-    const isLoading = status === "loading";
-    const isAuthenticated = status === "authenticated";
+
+    if (requireAuth && status === "loading") return <PageLoading />;
 
     return (
-        isLoading ? (
-            <PageLoading />
-        ) : (
-            isAuthenticated ? (
-                <div>
-                    <Navbar/>
-                    {children}
-                </div>
-            ) : (
-                <LoginBox />
-            )
-        )
+        <>
+            <Navbar />
+            {requireAuth && status !== "authenticated" ? <LoginBox /> : children}
+        </>
     );
 }

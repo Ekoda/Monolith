@@ -1,9 +1,9 @@
-import {Backdrop, CircularProgress} from "@mui/material";
+import {Box, CircularProgress} from "@mui/material";
 
 export default function PageLoading() {
     return (
-        <Backdrop sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }} open={true}>
-            <CircularProgress color="inherit" />
-        </Backdrop>
+        <Box sx={{ minHeight: "60vh", display: "grid", placeItems: "center" }}>
+            <CircularProgress size={28} thickness={5} />
+        </Box>
     )
 }
